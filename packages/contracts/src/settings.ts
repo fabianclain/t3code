@@ -49,6 +49,7 @@ import {
   ProviderDriverKind,
 } from "./providerInstance.ts";
 import { PullRequestMergeMethod } from "./pullRequest.ts";
+import { PlaneSettings } from "./plane.ts";
 
 export const TimestampFormat = Schema.Literals(["locale", "12-hour", "24-hour"]);
 export type TimestampFormat = typeof TimestampFormat.Type;
@@ -1354,6 +1355,9 @@ export const ServerSettings = Schema.Struct({
     Schema.withDecodingDefault(Effect.succeed(false)),
   ),
 
+  /** One tracker connection (Plane); null means not configured. The token never leaves the server. */
+  plane: Schema.NullOr(PlaneSettings).pipe(Schema.withDecodingDefault(Effect.succeed(null))),
+
   usagePriceOverrides: Schema.Record(TrimmedNonEmptyString, UsageModelPriceOverride).pipe(
     Schema.withDecodingDefault(Effect.succeed({})),
   ),
@@ -1670,6 +1674,9 @@ export const ServerSettingsPatch = Schema.Struct({
     Schema.Record(SecretProviderId, Schema.NullOr(SecretProviderConfigWrite)),
   ),
   cursorKeychainUsageEnabled: Schema.optionalKey(Schema.Boolean),
+
+  /** Merges per field; null removes the whole connection and its stored token. */
+  plane: Schema.optionalKey(Schema.NullOr(PlaneSettings)),
 
   usagePriceOverrides: Schema.optionalKey(
     Schema.Record(TrimmedNonEmptyString, Schema.NullOr(UsageModelPriceOverride)),

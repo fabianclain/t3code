@@ -60,6 +60,7 @@ import {
   FileSearchIcon,
   FolderGit2Icon,
   FolderIcon,
+  ListTodoIcon,
   FolderPlusIcon,
   MessageSquareDashedIcon,
   LinkIcon,
@@ -86,6 +87,7 @@ import type { LegendListRef } from "@legendapp/list/react";
 import { useAtomValue } from "@effect/atom-react";
 
 import { isDesktopLocalConnectionTarget } from "../connection/desktopLocal";
+import { isElectron } from "../env";
 import { useDesktopLocalBootstraps } from "../connection/useDesktopLocalBootstraps";
 import { useHandleNewThread } from "../hooks/useHandleNewThread";
 import { useOpenPanelPullRequestUrl } from "../hooks/useOpenPanelPullRequestUrl";
@@ -1494,6 +1496,20 @@ function OpenCommandPaletteDialog(props: {
       icon: <PullRequestGlyph.pullRequest className={ITEM_ICON_CLASS} />,
       run: async () => {
         await navigate({ to: "/pull-requests", search: readPullRequestListPreferences() });
+      },
+    });
+  }
+
+  // Plane tasks browse from the desktop app; the sidebar entry hides on web the same way.
+  if (isElectron) {
+    actionItems.push({
+      kind: "action",
+      value: "action:tasks",
+      searchTerms: ["tasks", "plane", "tracker", "todo", "issues"],
+      title: "Open tasks",
+      icon: <ListTodoIcon className={ITEM_ICON_CLASS} />,
+      run: async () => {
+        await navigate({ to: "/tasks" });
       },
     });
   }

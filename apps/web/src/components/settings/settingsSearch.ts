@@ -29,6 +29,7 @@ export type SettingsPath =
   | "/settings/browser"
   | "/settings/devices"
   | "/settings/scheduled-tasks"
+  | "/settings/plane"
   | "/settings/source-control"
   | "/settings/worktrees"
   | "/settings/connections"
@@ -99,6 +100,7 @@ export const SETTINGS_SECTION_LABELS: Readonly<Record<SettingsPath, string>> = {
   "/settings/browser": "Browser",
   "/settings/devices": "Devices",
   "/settings/scheduled-tasks": "Scheduled tasks",
+  "/settings/plane": "Plane",
   "/settings/source-control": "Source control",
   "/settings/worktrees": "Worktrees",
   "/settings/connections": "Environments",
@@ -134,6 +136,7 @@ export const SETTINGS_NAV_GROUPS: ReadonlyArray<{
       "/settings/browser",
       "/settings/devices",
       "/settings/scheduled-tasks",
+      "/settings/plane",
     ],
   },
   {
@@ -956,6 +959,17 @@ export const SETTINGS_SEARCH_ITEMS = [
     searchTerms: ["pull request merge squash rebase last selected"],
   },
   {
+    id: "plane",
+    title: "Plane connection",
+    to: "/settings/plane",
+    scope: "environment-defaults",
+    desktopOnly: true,
+    environmentOnly: true,
+    searchTerms: [
+      "plane tasks tracker issues work items workspace slug api token url instance self-hosted project",
+    ],
+  },
+  {
     id: "source-control",
     title: "Source control",
     to: "/settings/source-control",
@@ -1192,6 +1206,7 @@ const SETTINGS_CATEGORY_SCOPES: Readonly<Record<SettingsPath, SettingsSearchScop
   "/settings/threads": null,
   "/settings/browser": null,
   "/settings/devices": null,
+  "/settings/plane": "environment-defaults",
   "/settings/source-control": "environment-defaults",
   "/settings/worktrees": "project-defaults",
   "/settings/connections": "connections",
@@ -1328,6 +1343,15 @@ export function filterAvailableSettingsSearchItems(
       (!item.managedTunnelOnly || availability.managedTunnelActive === true) &&
       (!item.peerLinksOnly || availability.hasPeerLinkHost === true),
   );
+}
+
+/** A section whose every setting is desktop-only stays out of the nav outside the desktop app. */
+export function isSettingsSectionAvailableOnThisPlatform(path: SettingsPath): boolean {
+  if (isElectron) return true;
+  const items: ReadonlyArray<SettingsSearchItem> = SETTINGS_SEARCH_ITEMS;
+  const sectionItems = items.filter((item) => item.to === path);
+  if (sectionItems.length === 0) return true;
+  return !sectionItems.every((item) => item.desktopOnly === true);
 }
 
 /** The settings that exist on this platform and app channel. */

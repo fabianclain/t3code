@@ -55,6 +55,7 @@ import * as McpAppRequests from "./mcpApps/McpAppRequests.ts";
 import * as ModelManifest from "./provider/ModelManifest.ts";
 import * as Orchestrator from "./orchestration-v2/Orchestrator.ts";
 import * as OtlpEndpointCheck from "./observability/OtlpEndpointCheck.ts";
+import * as PlaneService from "./plane/PlaneService.ts";
 import * as PairingGrantStore from "./auth/PairingGrantStore.ts";
 import * as PeerLinkRequests from "./peer/PeerLinkRequests.ts";
 import * as PeerLinks from "./peer/PeerLinks.ts";
@@ -557,6 +558,8 @@ const layerUnusedConfigRpcServices = Layer.mergeAll(
 const layerConfigSources = Layer.mergeAll(
   Keybindings.layer,
   ServerSettings.layer.pipe(Layer.provide(ServerSecretStore.layer)),
+  // Config-boundary tests never call Plane; the ws layer just requires the service.
+  Layer.mock(PlaneService.PlaneService)({}),
 ).pipe(
   Layer.provideMerge(Layer.fresh(SqlitePersistence.layerMemory)),
   Layer.provideMerge(

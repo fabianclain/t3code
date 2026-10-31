@@ -23,6 +23,7 @@ import {
   PanelsTopLeftIcon,
   KeyboardIcon,
   KeyRoundIcon,
+  ListTodoIcon,
   PaletteIcon,
   SearchIcon,
   ServerIcon,
@@ -48,6 +49,7 @@ import {
 } from "../ui/sidebar";
 import { scrollToSettingsTarget } from "./settingsLayout";
 import {
+  isSettingsSectionAvailableOnThisPlatform,
   searchSettings,
   revealSettingsSearchTarget,
   SETTINGS_NAV_GROUPS,
@@ -99,6 +101,7 @@ const SETTINGS_SECTION_ICONS: Readonly<
   "/settings/browser": GlobeIcon,
   "/settings/devices": SmartphoneIcon,
   "/settings/scheduled-tasks": CalendarClockIcon,
+  "/settings/plane": ListTodoIcon,
   "/settings/source-control": GitBranchIcon,
   "/settings/worktrees": FolderTreeIcon,
   "/settings/connections": ServerIcon,
@@ -133,7 +136,12 @@ export function SettingsSidebarNav({ pathname }: { pathname: string }) {
   const currentSearch = useLocation({ select: (location) => location.search });
   const scopeSearch = validateSettingsScopeSearch(currentSearch);
   const activePath = SETTINGS_DETAIL_PAGE_PARENTS[pathname] ?? pathname;
-  const navPaths = SETTINGS_NAV_GROUPS.flatMap((group) => group.paths);
+  // A desktop-only section keeps its place in the order and leaves the nav elsewhere.
+  const navGroups = SETTINGS_NAV_GROUPS.map((group) => ({
+    ...group,
+    paths: group.paths.filter(isSettingsSectionAvailableOnThisPlatform),
+  })).filter((group) => group.paths.length > 0);
+  const navPaths = navGroups.flatMap((group) => group.paths);
   const sectionNavigation = useSettingsSectionNavigation(
     navPaths.find((to) => activePath === to || activePath.startsWith(`${to}/`)) ??
       navPaths[0] ??
@@ -380,7 +388,7 @@ export function SettingsSidebarNav({ pathname }: { pathname: string }) {
                   aria-label="Settings sections"
                   className="flex flex-col gap-4"
                 >
-                  {SETTINGS_NAV_GROUPS.map((group, index) => (
+                  {navGroups.map((group, index) => (
                     <div
                       key={group.heading ?? index}
                       role="group"

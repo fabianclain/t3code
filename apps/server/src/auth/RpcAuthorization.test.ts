@@ -12,6 +12,7 @@ import {
   AuthOrchestrationOperateScope,
   AuthOrchestrationReadScope,
   AuthSourceControlWriteScope,
+  AuthTasksWriteScope,
   AuthTerminalReadScope,
   AuthTerminalOperateScope,
   WS_METHODS,
@@ -49,6 +50,29 @@ describe("RPC authorization scopes", () => {
     expect(requiredScopeForRpcMethod(WS_METHODS.serverPrepareTriage)).toBe(
       AuthOrchestrationOperateScope,
     );
+  });
+
+  it("reads Plane with orchestration scope and gates tracker writes behind tasks scope", () => {
+    for (const method of [
+      WS_METHODS.planeConnectionStatus,
+      WS_METHODS.planeTestConnection,
+      WS_METHODS.planeListProjects,
+      WS_METHODS.planeProjectMetadata,
+      WS_METHODS.planeListTasks,
+      WS_METHODS.planeSearchTasks,
+      WS_METHODS.planeGetTask,
+      WS_METHODS.planeListComments,
+    ]) {
+      expect(requiredScopeForRpcMethod(method)).toBe(AuthOrchestrationReadScope);
+    }
+    // Tasks live on the user's tracker, so a forge grant or read-only session must not write there.
+    for (const method of [
+      WS_METHODS.planeCreateTask,
+      WS_METHODS.planeUpdateTask,
+      WS_METHODS.planeAddComment,
+    ]) {
+      expect(requiredScopeForRpcMethod(method)).toBe(AuthTasksWriteScope);
+    }
   });
 
   it("separates passive terminal observation from operations that can change a shell", () => {

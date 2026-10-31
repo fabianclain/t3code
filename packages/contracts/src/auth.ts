@@ -37,6 +37,8 @@ export const AuthDiagnosticsReadScope = "diagnostics:read" as const;
 export const AuthTerminalReadScope = "terminal:read" as const;
 export const AuthTerminalOperateScope = "terminal:operate" as const;
 export const AuthSourceControlWriteScope = "source-control:write" as const;
+/** Writing tracker tasks (Plane) mutates resources outside this environment's files and forge. */
+export const AuthTasksWriteScope = "tasks:write" as const;
 export const AuthFilesystemReadScope = "filesystem:read" as const;
 export const AuthFilesystemWriteScope = "filesystem:write" as const;
 /** Retained for decoding existing credentials; grants no current RPC access. */
@@ -59,6 +61,7 @@ export const AuthEnvironmentScope = Schema.Literals([
   AuthFilesystemWriteScope,
   AuthReviewWriteScope,
   AuthSourceControlWriteScope,
+  AuthTasksWriteScope,
   AuthAccessReadScope,
   AuthAccessWriteScope,
   AuthRelayReadScope,
@@ -104,6 +107,7 @@ const legacyParents: Partial<Record<AuthEnvironmentScope, AuthEnvironmentScope>>
   [AuthEnvironmentMaintainScope]: AuthOrchestrationOperateScope,
   [AuthPreviewOperateScope]: AuthOrchestrationOperateScope,
   [AuthSourceControlWriteScope]: AuthOrchestrationOperateScope,
+  [AuthTasksWriteScope]: AuthOrchestrationOperateScope,
   [AuthFilesystemWriteScope]: AuthOrchestrationOperateScope,
   [AuthTerminalReadScope]: AuthTerminalOperateScope,
 };
@@ -157,6 +161,7 @@ export const AuthStandardClientScopes = [
   AuthTerminalReadScope,
   AuthTerminalOperateScope,
   AuthSourceControlWriteScope,
+  AuthTasksWriteScope,
   AuthFilesystemReadScope,
   AuthFilesystemWriteScope,
   AuthRelayReadScope,

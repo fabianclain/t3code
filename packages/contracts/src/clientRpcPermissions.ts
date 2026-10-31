@@ -7,6 +7,7 @@ import {
   AuthPreviewOperateScope,
   AuthSettingsWriteScope,
   AuthSourceControlWriteScope,
+  AuthTasksWriteScope,
   AuthTerminalOperateScope,
   type AuthEnvironmentScope,
 } from "./auth.ts";
@@ -51,6 +52,10 @@ export const CLIENT_GUARDED_RPC_SCOPES = {
   [WS_METHODS.vcsCreateRef]: AuthSourceControlWriteScope,
   [WS_METHODS.vcsSwitchRef]: AuthSourceControlWriteScope,
   [WS_METHODS.vcsInit]: AuthSourceControlWriteScope,
+  // Tasks live on the user's tracker, not in this environment; a forge grant does not cover them.
+  [WS_METHODS.planeCreateTask]: AuthTasksWriteScope,
+  [WS_METHODS.planeUpdateTask]: AuthTasksWriteScope,
+  [WS_METHODS.planeAddComment]: AuthTasksWriteScope,
 
   // Starts an agent session on this environment that can read its logs and database.
   [WS_METHODS.serverPrepareTriage]: AuthOrchestrationOperateScope,

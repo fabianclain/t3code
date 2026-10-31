@@ -27,6 +27,28 @@ import {
   PeerLinkSummary,
 } from "./peerLink.ts";
 import {
+  PlaneAddCommentInput,
+  PlaneComment,
+  PlaneCommentsResult,
+  PlaneConnectionStatus,
+  PlaneConnectionStatusInput,
+  PlaneCreateTaskInput,
+  PlaneError,
+  PlaneListCommentsInput,
+  PlaneListProjectsInput,
+  PlaneListTasksInput,
+  PlaneProjectInput,
+  PlaneProjectMetadata,
+  PlaneProjectsResult,
+  PlaneSearchResult,
+  PlaneSearchTasksInput,
+  PlaneTask,
+  PlaneTaskInput,
+  PlaneTasksResult,
+  PlaneTestConnectionResult,
+  PlaneUpdateTaskInput,
+} from "./plane.ts";
+import {
   ChatGptReconnectProfileInput,
   ChatGptReconnectProfile,
   ChatGptImportProfileInput,
@@ -585,6 +607,18 @@ export const WS_METHODS = {
   pullRequestsRequestReviewers: "pullRequests.requestReviewers",
   pullRequestsLabelCandidates: "pullRequests.labelCandidates",
   pullRequestsSetLabels: "pullRequests.setLabels",
+
+  planeConnectionStatus: "plane.connectionStatus",
+  planeTestConnection: "plane.testConnection",
+  planeListProjects: "plane.listProjects",
+  planeProjectMetadata: "plane.projectMetadata",
+  planeListTasks: "plane.listTasks",
+  planeSearchTasks: "plane.searchTasks",
+  planeGetTask: "plane.getTask",
+  planeListComments: "plane.listComments",
+  planeCreateTask: "plane.createTask",
+  planeUpdateTask: "plane.updateTask",
+  planeAddComment: "plane.addComment",
 
   sourceControlLookupRepository: "sourceControl.lookupRepository",
   sourceControlCloneRepository: "sourceControl.cloneRepository",
@@ -1203,6 +1237,74 @@ const WsPullRequestsSetLabelsRpc = Rpc.make(WS_METHODS.pullRequestsSetLabels, {
   payload: PullRequestLabelChangeInput,
   success: Schema.Void,
   error: PullRequestRpcError,
+});
+
+const PlaneRpcError = Schema.Union([PlaneError, EnvironmentAuthorizationError]);
+
+const WsPlaneConnectionStatusRpc = Rpc.make(WS_METHODS.planeConnectionStatus, {
+  payload: PlaneConnectionStatusInput,
+  success: PlaneConnectionStatus,
+  error: PlaneRpcError,
+});
+
+const WsPlaneTestConnectionRpc = Rpc.make(WS_METHODS.planeTestConnection, {
+  payload: PlaneConnectionStatusInput,
+  success: PlaneTestConnectionResult,
+  error: PlaneRpcError,
+});
+
+const WsPlaneListProjectsRpc = Rpc.make(WS_METHODS.planeListProjects, {
+  payload: PlaneListProjectsInput,
+  success: PlaneProjectsResult,
+  error: PlaneRpcError,
+});
+
+const WsPlaneProjectMetadataRpc = Rpc.make(WS_METHODS.planeProjectMetadata, {
+  payload: PlaneProjectInput,
+  success: PlaneProjectMetadata,
+  error: PlaneRpcError,
+});
+
+const WsPlaneListTasksRpc = Rpc.make(WS_METHODS.planeListTasks, {
+  payload: PlaneListTasksInput,
+  success: PlaneTasksResult,
+  error: PlaneRpcError,
+});
+
+const WsPlaneSearchTasksRpc = Rpc.make(WS_METHODS.planeSearchTasks, {
+  payload: PlaneSearchTasksInput,
+  success: PlaneSearchResult,
+  error: PlaneRpcError,
+});
+
+const WsPlaneGetTaskRpc = Rpc.make(WS_METHODS.planeGetTask, {
+  payload: PlaneTaskInput,
+  success: PlaneTask,
+  error: PlaneRpcError,
+});
+
+const WsPlaneListCommentsRpc = Rpc.make(WS_METHODS.planeListComments, {
+  payload: PlaneListCommentsInput,
+  success: PlaneCommentsResult,
+  error: PlaneRpcError,
+});
+
+const WsPlaneCreateTaskRpc = Rpc.make(WS_METHODS.planeCreateTask, {
+  payload: PlaneCreateTaskInput,
+  success: PlaneTask,
+  error: PlaneRpcError,
+});
+
+const WsPlaneUpdateTaskRpc = Rpc.make(WS_METHODS.planeUpdateTask, {
+  payload: PlaneUpdateTaskInput,
+  success: PlaneTask,
+  error: PlaneRpcError,
+});
+
+const WsPlaneAddCommentRpc = Rpc.make(WS_METHODS.planeAddComment, {
+  payload: PlaneAddCommentInput,
+  success: PlaneComment,
+  error: PlaneRpcError,
 });
 
 const WsSourceControlLookupRepositoryRpc = Rpc.make(WS_METHODS.sourceControlLookupRepository, {
@@ -2072,6 +2174,17 @@ export const WsRpcGroup = RpcGroup.make(
   WsPullRequestsRequestReviewersRpc,
   WsPullRequestsLabelCandidatesRpc,
   WsPullRequestsSetLabelsRpc,
+  WsPlaneConnectionStatusRpc,
+  WsPlaneTestConnectionRpc,
+  WsPlaneListProjectsRpc,
+  WsPlaneProjectMetadataRpc,
+  WsPlaneListTasksRpc,
+  WsPlaneSearchTasksRpc,
+  WsPlaneGetTaskRpc,
+  WsPlaneListCommentsRpc,
+  WsPlaneCreateTaskRpc,
+  WsPlaneUpdateTaskRpc,
+  WsPlaneAddCommentRpc,
   WsSourceControlLookupRepositoryRpc,
   WsSourceControlCloneRepositoryRpc,
   WsSourceControlPublishRepositoryRpc,

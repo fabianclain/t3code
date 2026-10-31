@@ -3,6 +3,7 @@ import * as Context from "effect/Context";
 import * as Crypto from "effect/Crypto";
 import * as Orchestrator from "./orchestration-v2/Orchestrator.ts";
 import * as PeerLinkRequests from "./peer/PeerLinkRequests.ts";
+import * as PlaneService from "./plane/PlaneService.ts";
 import * as PeerLinks from "./peer/PeerLinks.ts";
 
 import * as DateTime from "effect/DateTime";
@@ -1276,6 +1277,7 @@ export const layerWsRpc = (
       const secretRequests = yield* SecretRequests.SecretRequests;
       const guestShares = yield* GuestShareService.GuestShareService;
       const pullRequests = yield* PullRequestService.PullRequestService;
+      const plane = yield* PlaneService.PlaneService;
       const reviewGuides = yield* PullRequestReviewGuideService.PullRequestReviewGuideService;
       const pullRequestSync = yield* PullRequestSyncReactor.PullRequestSyncReactor;
       const deviceService = yield* DeviceService.DeviceService;
@@ -2673,6 +2675,17 @@ export const layerWsRpc = (
           withPullRequestViewer(input, pullRequests.labelCandidates(input)),
         [WS_METHODS.pullRequestsSetLabels]: (input) =>
           withPullRequestViewer(input, pullRequests.setLabels(input)),
+        [WS_METHODS.planeConnectionStatus]: () => plane.connectionStatus,
+        [WS_METHODS.planeTestConnection]: () => plane.testConnection({}),
+        [WS_METHODS.planeListProjects]: (input) => plane.listProjects(input),
+        [WS_METHODS.planeProjectMetadata]: (input) => plane.projectMetadata(input),
+        [WS_METHODS.planeListTasks]: (input) => plane.listTasks(input),
+        [WS_METHODS.planeSearchTasks]: (input) => plane.searchTasks(input),
+        [WS_METHODS.planeGetTask]: (input) => plane.getTask(input),
+        [WS_METHODS.planeListComments]: (input) => plane.listComments(input),
+        [WS_METHODS.planeCreateTask]: (input) => plane.createTask(input),
+        [WS_METHODS.planeUpdateTask]: (input) => plane.updateTask(input),
+        [WS_METHODS.planeAddComment]: (input) => plane.addComment(input),
         [WS_METHODS.sourceControlLookupRepository]: (input) =>
           sourceControlRepositories.lookupRepository(input),
         [WS_METHODS.sourceControlCloneRepository]: (input) =>
@@ -3278,6 +3291,7 @@ export const layer = Layer.unwrap(
     const serverSelfUpdate = yield* ServerSelfUpdate.ServerSelfUpdate;
     const npmRelease = yield* NpmRelease.NpmRelease;
     const pullRequests = yield* PullRequestService.PullRequestService;
+    const plane = yield* PlaneService.PlaneService;
     const reviewGuides = yield* PullRequestReviewGuideService.PullRequestReviewGuideService;
     const peerLinks = yield* PeerLinks.PeerLinks;
     const peerLinkRequests = yield* PeerLinkRequests.PeerLinkRequests;
@@ -3355,6 +3369,7 @@ export const layer = Layer.unwrap(
               Layer.provide(Layer.succeed(ServerSelfUpdate.ServerSelfUpdate, serverSelfUpdate)),
               // Share server-lifetime PR caches so WS mutations invalidate every client's HTTP diffs.
               Layer.provide(Layer.succeed(PullRequestService.PullRequestService, pullRequests)),
+              Layer.provide(Layer.succeed(PlaneService.PlaneService, plane)),
               Layer.provide(OtlpEndpointCheck.layer),
               Layer.provide(
                 Layer.succeed(

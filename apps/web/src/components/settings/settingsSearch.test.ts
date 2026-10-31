@@ -12,6 +12,7 @@ import {
   getSettingsSearchTargetScope,
   getThreadAutoSettlementSearchAvailability,
   isSettingsSearchScopeAvailable,
+  isSettingsSectionAvailableOnThisPlatform,
   movedSettingsPath,
   searchSettings,
   SETTINGS_NAV_GROUPS,
@@ -102,6 +103,14 @@ describe("searchSettings", () => {
     expect(searchSettings("hold to quit")).toEqual([]);
     expect(searchSettings("wsl")).toEqual([]);
     expect(searchSettings("update track")).toEqual([]);
+  });
+
+  it("keeps the Plane connection out of the browser nav and search", () => {
+    expect(SETTINGS_SEARCH_ITEMS.some((item) => item.id === "plane")).toBe(true);
+    expect(SETTINGS_NAV_GROUPS.flatMap((group) => group.paths)).toContain("/settings/plane");
+    expect(isSettingsSectionAvailableOnThisPlatform("/settings/plane")).toBe(false);
+    expect(searchSettings("plane")).toEqual([]);
+    expect(isSettingsSectionAvailableOnThisPlatform("/settings/source-control")).toBe(true);
   });
 
   it("hides settings whose controls are unavailable", () => {
